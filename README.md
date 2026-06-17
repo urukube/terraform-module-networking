@@ -265,134 +265,132 @@ If you don't specify subnet CIDRs, they will be auto-calculated from the VPC CID
 This module is part of OrbitCluster and follows the project's licensing terms.
 
 <!-- BEGIN_TF_DOCS -->
-
 ## Requirements
 
-| Name                                                                     | Version              |
-| ------------------------------------------------------------------------ | -------------------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement_terraform) | >= 1.5.0             |
-| <a name="requirement_aws"></a> [aws](#requirement_aws)                   | >= 6.15.0, <= 6.31.0 |
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.15.0, <= 6.31.0 |
 
 ## Providers
 
-| Name                                             | Version              |
-| ------------------------------------------------ | -------------------- |
-| <a name="provider_aws"></a> [aws](#provider_aws) | >= 6.15.0, <= 6.31.0 |
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.15.0, <= 6.31.0 |
 
 ## Modules
 
-| Name                                         | Source                        | Version  |
-| -------------------------------------------- | ----------------------------- | -------- |
-| <a name="module_vpc"></a> [vpc](#module_vpc) | terraform-aws-modules/vpc/aws | ~> 5.5.0 |
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 5.5.0 |
 
 ## Resources
 
-| Name                                                                                                                                                                            | Type        |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [aws_lb.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb)                                                                            | resource    |
-| [aws_lb.network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb)                                                                                | resource    |
-| [aws_lb_listener.application_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener)                                                     | resource    |
-| [aws_lb_listener.application_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener)                                                    | resource    |
-| [aws_lb_listener.network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener)                                                              | resource    |
-| [aws_lb_target_group.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group)                                                  | resource    |
-| [aws_lb_target_group.network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group)                                                      | resource    |
-| [aws_security_group.alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group)                                                            | resource    |
-| [aws_security_group.eks_control_plane](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group)                                              | resource    |
-| [aws_security_group.eks_nodes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group)                                                      | resource    |
-| [aws_security_group.istio](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group)                                                          | resource    |
-| [aws_security_group.vpc_endpoints](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group)                                                  | resource    |
-| [aws_vpc_endpoint.gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint)                                                            | resource    |
-| [aws_vpc_endpoint.interface](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint)                                                          | resource    |
-| [aws_vpc_security_group_egress_rule.alb_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule)                     | resource    |
-| [aws_vpc_security_group_egress_rule.control_plane_to_nodes_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule)   | resource    |
-| [aws_vpc_security_group_egress_rule.control_plane_to_nodes_kubelet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource    |
-| [aws_vpc_security_group_egress_rule.eks_nodes_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule)               | resource    |
-| [aws_vpc_security_group_egress_rule.istio_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule)                   | resource    |
-| [aws_vpc_security_group_egress_rule.vpc_endpoints_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule)           | resource    |
-| [aws_vpc_security_group_ingress_rule.alb_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)                     | resource    |
-| [aws_vpc_security_group_ingress_rule.alb_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)                    | resource    |
-| [aws_vpc_security_group_ingress_rule.control_plane_from_nodes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)     | resource    |
-| [aws_vpc_security_group_ingress_rule.eks_nodes_nlb_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)        | resource    |
-| [aws_vpc_security_group_ingress_rule.eks_nodes_vpc_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)        | resource    |
-| [aws_vpc_security_group_ingress_rule.istio_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)                  | resource    |
-| [aws_vpc_security_group_ingress_rule.istio_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)                | resource    |
-| [aws_vpc_security_group_ingress_rule.istio_pilot](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)                  | resource    |
-| [aws_vpc_security_group_ingress_rule.vpc_endpoints_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule)          | resource    |
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones)                                           | data source |
-| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity)                                                   | data source |
-| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region)                                                                     | data source |
+| Name | Type |
+|------|------|
+| [aws_lb.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb.network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb_listener.application_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_listener.application_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_listener.network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_target_group.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_lb_target_group.network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_security_group.alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.eks_control_plane](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.eks_nodes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.istio](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.vpc_endpoints](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_vpc_endpoint.gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_vpc_endpoint.interface](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_vpc_security_group_egress_rule.alb_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_egress_rule.control_plane_to_nodes_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_egress_rule.control_plane_to_nodes_kubelet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_egress_rule.eks_nodes_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_egress_rule.istio_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_egress_rule.vpc_endpoints_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.alb_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.alb_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.control_plane_from_nodes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.eks_nodes_nlb_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.eks_nodes_vpc_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.istio_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.istio_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.istio_pilot](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.vpc_endpoints_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ## Inputs
 
-| Name                                                                                                                  | Description                                                                                                                    | Type           | Default                                                                                                                                                                                                                                               | Required |
-| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------: |
-| <a name="input_alb_access_logs_bucket_name"></a> [alb_access_logs_bucket_name](#input_alb_access_logs_bucket_name)    | S3 bucket name for ALB access logs. If null, logging is disabled                                                               | `string`       | `null`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_alb_access_logs_prefix"></a> [alb_access_logs_prefix](#input_alb_access_logs_prefix)                   | S3 prefix for ALB access logs                                                                                                  | `string`       | `null`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_alb_certificate_arn"></a> [alb_certificate_arn](#input_alb_certificate_arn)                            | ARN of ACM certificate for HTTPS listener                                                                                      | `string`       | `null`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_alb_deletion_protection"></a> [alb_deletion_protection](#input_alb_deletion_protection)                | Enable deletion protection for ALB                                                                                             | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_alb_http_enabled"></a> [alb_http_enabled](#input_alb_http_enabled)                                     | Enable HTTP listener for ALB                                                                                                   | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_alb_https_enabled"></a> [alb_https_enabled](#input_alb_https_enabled)                                  | Enable HTTPS listener for ALB                                                                                                  | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_alb_ingress_cidr_blocks"></a> [alb_ingress_cidr_blocks](#input_alb_ingress_cidr_blocks)                | List of CIDR blocks to allow ingress to ALB (HTTP/HTTPS)                                                                       | `list(string)` | <pre>[<br/> "0.0.0.0/0"<br/>]</pre>                                                                                                                                                                                                                   |    no    |
-| <a name="input_alb_subnet_ids"></a> [alb_subnet_ids](#input_alb_subnet_ids)                                           | Subnet IDs for ALB. If not specified, uses public subnets                                                                      | `list(string)` | `[]`                                                                                                                                                                                                                                                  |    no    |
-| <a name="input_app_id"></a> [app_id](#input_app_id)                                                                   | application Unit                                                                                                               | `string`       | `null`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_azs"></a> [azs](#input_azs)                                                                            | List of availability zones. If not provided, will auto-detect 2-3 AZs in the region                                            | `list(string)` | `[]`                                                                                                                                                                                                                                                  |    no    |
-| <a name="input_bu_id"></a> [bu_id](#input_bu_id)                                                                      | Business Unit                                                                                                                  | `string`       | `null`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_enable_alb"></a> [enable_alb](#input_enable_alb)                                                       | Create Application Load Balancer                                                                                               | `bool`         | `false`                                                                                                                                                                                                                                               |    no    |
-| <a name="input_enable_dns_hostnames"></a> [enable_dns_hostnames](#input_enable_dns_hostnames)                         | Enable DNS hostnames in VPC                                                                                                    | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_enable_dns_support"></a> [enable_dns_support](#input_enable_dns_support)                               | Enable DNS support in VPC                                                                                                      | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_enable_flow_logs"></a> [enable_flow_logs](#input_enable_flow_logs)                                     | Enable VPC Flow Logs to CloudWatch                                                                                             | `bool`         | `false`                                                                                                                                                                                                                                               |    no    |
-| <a name="input_enable_istio_support"></a> [enable_istio_support](#input_enable_istio_support)                         | Configure security groups for Istio service mesh                                                                               | `bool`         | `false`                                                                                                                                                                                                                                               |    no    |
-| <a name="input_enable_nat_gateway"></a> [enable_nat_gateway](#input_enable_nat_gateway)                               | Enable NAT Gateway for private subnets                                                                                         | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_enable_network_load_balancer"></a> [enable_network_load_balancer](#input_enable_network_load_balancer) | Create Network Load Balancer in public subnets                                                                                 | `bool`         | `false`                                                                                                                                                                                                                                               |    no    |
-| <a name="input_enable_vpc_endpoints"></a> [enable_vpc_endpoints](#input_enable_vpc_endpoints)                         | Enable VPC endpoints for AWS services                                                                                          | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_enable_vpn_gateway"></a> [enable_vpn_gateway](#input_enable_vpn_gateway)                               | Enable VPN Gateway                                                                                                             | `bool`         | `false`                                                                                                                                                                                                                                               |    no    |
-| <a name="input_env"></a> [env](#input_env)                                                                            | Environment name (dev, staging, prod)                                                                                          | `string`       | n/a                                                                                                                                                                                                                                                   |   yes    |
-| <a name="input_flow_logs_retention_days"></a> [flow_logs_retention_days](#input_flow_logs_retention_days)             | CloudWatch log retention for flow logs in days                                                                                 | `number`       | `7`                                                                                                                                                                                                                                                   |    no    |
-| <a name="input_friendly_name"></a> [friendly_name](#input_friendly_name)                                              | Friendly name prefix for resources (e.g., 'allhub', 'devspoke'). Used in resource naming and EKS cluster identification.       | `string`       | n/a                                                                                                                                                                                                                                                   |   yes    |
-| <a name="input_nlb_access_logs_bucket_name"></a> [nlb_access_logs_bucket_name](#input_nlb_access_logs_bucket_name)    | S3 bucket name for NLB access logs. If null, logging is disabled                                                               | `string`       | `null`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_nlb_access_logs_prefix"></a> [nlb_access_logs_prefix](#input_nlb_access_logs_prefix)                   | S3 prefix for NLB access logs                                                                                                  | `string`       | `null`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_nlb_deletion_protection"></a> [nlb_deletion_protection](#input_nlb_deletion_protection)                | Enable deletion protection for Network Load Balancer                                                                           | `bool`         | `true`                                                                                                                                                                                                                                                |    no    |
-| <a name="input_nlb_subnet_ids"></a> [nlb_subnet_ids](#input_nlb_subnet_ids)                                           | Subnet IDs for NLB. If not specified, uses public subnets                                                                      | `list(string)` | `[]`                                                                                                                                                                                                                                                  |    no    |
-| <a name="input_private_subnets"></a> [private_subnets](#input_private_subnets)                                        | List of CIDR blocks for private subnets. If not provided, will auto-calculate based on VPC CIDR                                | `list(string)` | `[]`                                                                                                                                                                                                                                                  |    no    |
-| <a name="input_public_subnets"></a> [public_subnets](#input_public_subnets)                                           | List of CIDR blocks for public subnets. If not provided, will auto-calculate based on VPC CIDR                                 | `list(string)` | `[]`                                                                                                                                                                                                                                                  |    no    |
-| <a name="input_single_nat_gateway"></a> [single_nat_gateway](#input_single_nat_gateway)                               | Use single NAT Gateway to reduce costs (not recommended for production)                                                        | `bool`         | `false`                                                                                                                                                                                                                                               |    no    |
-| <a name="input_tags"></a> [tags](#input_tags)                                                                         | Additional tags for all resources                                                                                              | `map(string)`  | `{}`                                                                                                                                                                                                                                                  |    no    |
-| <a name="input_vpc_cidr"></a> [vpc_cidr](#input_vpc_cidr)                                                             | CIDR block for VPC                                                                                                             | `string`       | `"10.0.0.0/16"`                                                                                                                                                                                                                                       |    no    |
-| <a name="input_vpc_endpoints"></a> [vpc_endpoints](#input_vpc_endpoints)                                              | Map of VPC endpoints to create. Valid keys: ssm, ssmmessages, ec2messages, kms, ecr_api, ecr_dkr, ec2, sts, logs, s3, dynamodb | `map(bool)`    | <pre>{<br/> "dynamodb": false,<br/> "ec2": true,<br/> "ec2messages": true,<br/> "ecr_api": true,<br/> "ecr_dkr": true,<br/> "kms": true,<br/> "logs": true,<br/> "s3": true,<br/> "ssm": true,<br/> "ssmmessages": true,<br/> "sts": true<br/>}</pre> |    no    |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_alb_access_logs_bucket_name"></a> [alb\_access\_logs\_bucket\_name](#input\_alb\_access\_logs\_bucket\_name) | S3 bucket name for ALB access logs. If null, logging is disabled | `string` | `null` | no |
+| <a name="input_alb_access_logs_prefix"></a> [alb\_access\_logs\_prefix](#input\_alb\_access\_logs\_prefix) | S3 prefix for ALB access logs | `string` | `null` | no |
+| <a name="input_alb_certificate_arn"></a> [alb\_certificate\_arn](#input\_alb\_certificate\_arn) | ARN of ACM certificate for HTTPS listener | `string` | `null` | no |
+| <a name="input_alb_deletion_protection"></a> [alb\_deletion\_protection](#input\_alb\_deletion\_protection) | Enable deletion protection for ALB | `bool` | `true` | no |
+| <a name="input_alb_http_enabled"></a> [alb\_http\_enabled](#input\_alb\_http\_enabled) | Enable HTTP listener for ALB | `bool` | `true` | no |
+| <a name="input_alb_https_enabled"></a> [alb\_https\_enabled](#input\_alb\_https\_enabled) | Enable HTTPS listener for ALB | `bool` | `true` | no |
+| <a name="input_alb_ingress_cidr_blocks"></a> [alb\_ingress\_cidr\_blocks](#input\_alb\_ingress\_cidr\_blocks) | List of CIDR blocks to allow ingress to ALB (HTTP/HTTPS) | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
+| <a name="input_alb_subnet_ids"></a> [alb\_subnet\_ids](#input\_alb\_subnet\_ids) | Subnet IDs for ALB. If not specified, uses public subnets | `list(string)` | `[]` | no |
+| <a name="input_app_id"></a> [app\_id](#input\_app\_id) | application Unit | `string` | `null` | no |
+| <a name="input_azs"></a> [azs](#input\_azs) | List of availability zones. If not provided, will auto-detect 2-3 AZs in the region | `list(string)` | `[]` | no |
+| <a name="input_bu_id"></a> [bu\_id](#input\_bu\_id) | Business Unit | `string` | `null` | no |
+| <a name="input_enable_alb"></a> [enable\_alb](#input\_enable\_alb) | Create Application Load Balancer | `bool` | `false` | no |
+| <a name="input_enable_dns_hostnames"></a> [enable\_dns\_hostnames](#input\_enable\_dns\_hostnames) | Enable DNS hostnames in VPC | `bool` | `true` | no |
+| <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | Enable DNS support in VPC | `bool` | `true` | no |
+| <a name="input_enable_flow_logs"></a> [enable\_flow\_logs](#input\_enable\_flow\_logs) | Enable VPC Flow Logs to CloudWatch | `bool` | `false` | no |
+| <a name="input_enable_istio_support"></a> [enable\_istio\_support](#input\_enable\_istio\_support) | Configure security groups for Istio service mesh | `bool` | `false` | no |
+| <a name="input_enable_nat_gateway"></a> [enable\_nat\_gateway](#input\_enable\_nat\_gateway) | Enable NAT Gateway for private subnets | `bool` | `true` | no |
+| <a name="input_enable_network_load_balancer"></a> [enable\_network\_load\_balancer](#input\_enable\_network\_load\_balancer) | Create Network Load Balancer in public subnets | `bool` | `false` | no |
+| <a name="input_enable_vpc_endpoints"></a> [enable\_vpc\_endpoints](#input\_enable\_vpc\_endpoints) | Enable VPC endpoints for AWS services | `bool` | `true` | no |
+| <a name="input_enable_vpn_gateway"></a> [enable\_vpn\_gateway](#input\_enable\_vpn\_gateway) | Enable VPN Gateway | `bool` | `false` | no |
+| <a name="input_env"></a> [env](#input\_env) | Environment name (dev, staging, prod) | `string` | n/a | yes |
+| <a name="input_flow_logs_retention_days"></a> [flow\_logs\_retention\_days](#input\_flow\_logs\_retention\_days) | CloudWatch log retention for flow logs in days | `number` | `7` | no |
+| <a name="input_friendly_name"></a> [friendly\_name](#input\_friendly\_name) | Friendly name prefix for resources (e.g., 'allhub', 'devspoke'). Used in resource naming and EKS cluster identification. | `string` | n/a | yes |
+| <a name="input_nlb_access_logs_bucket_name"></a> [nlb\_access\_logs\_bucket\_name](#input\_nlb\_access\_logs\_bucket\_name) | S3 bucket name for NLB access logs. If null, logging is disabled | `string` | `null` | no |
+| <a name="input_nlb_access_logs_prefix"></a> [nlb\_access\_logs\_prefix](#input\_nlb\_access\_logs\_prefix) | S3 prefix for NLB access logs | `string` | `null` | no |
+| <a name="input_nlb_deletion_protection"></a> [nlb\_deletion\_protection](#input\_nlb\_deletion\_protection) | Enable deletion protection for Network Load Balancer | `bool` | `true` | no |
+| <a name="input_nlb_subnet_ids"></a> [nlb\_subnet\_ids](#input\_nlb\_subnet\_ids) | Subnet IDs for NLB. If not specified, uses public subnets | `list(string)` | `[]` | no |
+| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | List of CIDR blocks for private subnets. If not provided, will auto-calculate based on VPC CIDR | `list(string)` | `[]` | no |
+| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | List of CIDR blocks for public subnets. If not provided, will auto-calculate based on VPC CIDR | `list(string)` | `[]` | no |
+| <a name="input_single_nat_gateway"></a> [single\_nat\_gateway](#input\_single\_nat\_gateway) | Use single NAT Gateway to reduce costs (not recommended for production) | `bool` | `false` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Additional tags for all resources | `map(string)` | `{}` | no |
+| <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for VPC | `string` | `"10.0.0.0/16"` | no |
+| <a name="input_vpc_endpoints"></a> [vpc\_endpoints](#input\_vpc\_endpoints) | Map of VPC endpoints to create. Valid keys: ssm, ssmmessages, ec2messages, kms, ecr\_api, ecr\_dkr, ec2, sts, logs, s3, dynamodb | `map(bool)` | <pre>{<br/>  "dynamodb": false,<br/>  "ec2": true,<br/>  "ec2messages": true,<br/>  "ecr_api": true,<br/>  "ecr_dkr": true,<br/>  "kms": true,<br/>  "logs": true,<br/>  "s3": true,<br/>  "ssm": true,<br/>  "ssmmessages": true,<br/>  "sts": true<br/>}</pre> | no |
 
 ## Outputs
 
-| Name                                                                                                                                      | Description                                           |
-| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| <a name="output_alb_arn"></a> [alb_arn](#output_alb_arn)                                                                                  | Application Load Balancer ARN (if created)            |
-| <a name="output_alb_dns_name"></a> [alb_dns_name](#output_alb_dns_name)                                                                   | Application Load Balancer DNS name (if created)       |
-| <a name="output_alb_security_group_id"></a> [alb_security_group_id](#output_alb_security_group_id)                                        | Security group ID for ALB (if created)                |
-| <a name="output_alb_zone_id"></a> [alb_zone_id](#output_alb_zone_id)                                                                      | Application Load Balancer hosted zone ID (if created) |
-| <a name="output_all_subnet_ids"></a> [all_subnet_ids](#output_all_subnet_ids)                                                             | Combined list of all subnet IDs                       |
-| <a name="output_azs"></a> [azs](#output_azs)                                                                                              | Availability zones used                               |
-| <a name="output_control_plane_security_group_id"></a> [control_plane_security_group_id](#output_control_plane_security_group_id)          | Security group ID for EKS control plane               |
-| <a name="output_igw_id"></a> [igw_id](#output_igw_id)                                                                                     | Internet Gateway ID                                   |
-| <a name="output_istio_security_group_id"></a> [istio_security_group_id](#output_istio_security_group_id)                                  | Security group ID for Istio service mesh              |
-| <a name="output_nat_gateway_ids"></a> [nat_gateway_ids](#output_nat_gateway_ids)                                                          | NAT Gateway IDs                                       |
-| <a name="output_nat_gateway_public_ips"></a> [nat_gateway_public_ips](#output_nat_gateway_public_ips)                                     | Elastic IPs of NAT Gateways                           |
-| <a name="output_nlb_arn"></a> [nlb_arn](#output_nlb_arn)                                                                                  | Network Load Balancer ARN (if created)                |
-| <a name="output_nlb_dns_name"></a> [nlb_dns_name](#output_nlb_dns_name)                                                                   | Network Load Balancer DNS name (if created)           |
-| <a name="output_nlb_target_group_arn"></a> [nlb_target_group_arn](#output_nlb_target_group_arn)                                           | NLB target group ARN (if created)                     |
-| <a name="output_nlb_zone_id"></a> [nlb_zone_id](#output_nlb_zone_id)                                                                      | Network Load Balancer hosted zone ID (if created)     |
-| <a name="output_node_security_group_id"></a> [node_security_group_id](#output_node_security_group_id)                                     | Security group ID for EKS nodes                       |
-| <a name="output_private_route_table_ids"></a> [private_route_table_ids](#output_private_route_table_ids)                                  | Private route table IDs                               |
-| <a name="output_private_subnet_cidrs"></a> [private_subnet_cidrs](#output_private_subnet_cidrs)                                           | List of private subnet CIDR blocks                    |
-| <a name="output_private_subnet_ids"></a> [private_subnet_ids](#output_private_subnet_ids)                                                 | List of private subnet IDs (for EKS nodes)            |
-| <a name="output_public_route_table_ids"></a> [public_route_table_ids](#output_public_route_table_ids)                                     | Public route table IDs                                |
-| <a name="output_public_subnet_cidrs"></a> [public_subnet_cidrs](#output_public_subnet_cidrs)                                              | List of public subnet CIDR blocks                     |
-| <a name="output_public_subnet_ids"></a> [public_subnet_ids](#output_public_subnet_ids)                                                    | List of public subnet IDs (for load balancers)        |
-| <a name="output_vpc_arn"></a> [vpc_arn](#output_vpc_arn)                                                                                  | ARN of the VPC                                        |
-| <a name="output_vpc_cidr"></a> [vpc_cidr](#output_vpc_cidr)                                                                               | VPC CIDR block                                        |
-| <a name="output_vpc_default_security_group_id"></a> [vpc_default_security_group_id](#output_vpc_default_security_group_id)                | Default VPC security group ID                         |
-| <a name="output_vpc_endpoint_interface_dns_entries"></a> [vpc_endpoint_interface_dns_entries](#output_vpc_endpoint_interface_dns_entries) | DNS entries for interface VPC endpoints               |
-| <a name="output_vpc_endpoint_security_group_id"></a> [vpc_endpoint_security_group_id](#output_vpc_endpoint_security_group_id)             | Security group ID for VPC endpoints                   |
-| <a name="output_vpc_endpoints"></a> [vpc_endpoints](#output_vpc_endpoints)                                                                | Map of VPC endpoint IDs                               |
-| <a name="output_vpc_id"></a> [vpc_id](#output_vpc_id)                                                                                     | VPC ID for EKS module                                 |
-| <a name="output_vpc_tags"></a> [vpc_tags](#output_vpc_tags)                                                                               | Tags applied to the VPC                               |
-
+| Name | Description |
+|------|-------------|
+| <a name="output_alb_arn"></a> [alb\_arn](#output\_alb\_arn) | Application Load Balancer ARN (if created) |
+| <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | Application Load Balancer DNS name (if created) |
+| <a name="output_alb_security_group_id"></a> [alb\_security\_group\_id](#output\_alb\_security\_group\_id) | Security group ID for ALB (if created) |
+| <a name="output_alb_zone_id"></a> [alb\_zone\_id](#output\_alb\_zone\_id) | Application Load Balancer hosted zone ID (if created) |
+| <a name="output_all_subnet_ids"></a> [all\_subnet\_ids](#output\_all\_subnet\_ids) | Combined list of all subnet IDs |
+| <a name="output_azs"></a> [azs](#output\_azs) | Availability zones used |
+| <a name="output_control_plane_security_group_id"></a> [control\_plane\_security\_group\_id](#output\_control\_plane\_security\_group\_id) | Security group ID for EKS control plane |
+| <a name="output_igw_id"></a> [igw\_id](#output\_igw\_id) | Internet Gateway ID |
+| <a name="output_istio_security_group_id"></a> [istio\_security\_group\_id](#output\_istio\_security\_group\_id) | Security group ID for Istio service mesh |
+| <a name="output_nat_gateway_ids"></a> [nat\_gateway\_ids](#output\_nat\_gateway\_ids) | NAT Gateway IDs |
+| <a name="output_nat_gateway_public_ips"></a> [nat\_gateway\_public\_ips](#output\_nat\_gateway\_public\_ips) | Elastic IPs of NAT Gateways |
+| <a name="output_nlb_arn"></a> [nlb\_arn](#output\_nlb\_arn) | Network Load Balancer ARN (if created) |
+| <a name="output_nlb_dns_name"></a> [nlb\_dns\_name](#output\_nlb\_dns\_name) | Network Load Balancer DNS name (if created) |
+| <a name="output_nlb_target_group_arn"></a> [nlb\_target\_group\_arn](#output\_nlb\_target\_group\_arn) | NLB target group ARN (if created) |
+| <a name="output_nlb_zone_id"></a> [nlb\_zone\_id](#output\_nlb\_zone\_id) | Network Load Balancer hosted zone ID (if created) |
+| <a name="output_node_security_group_id"></a> [node\_security\_group\_id](#output\_node\_security\_group\_id) | Security group ID for EKS nodes |
+| <a name="output_private_route_table_ids"></a> [private\_route\_table\_ids](#output\_private\_route\_table\_ids) | Private route table IDs |
+| <a name="output_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#output\_private\_subnet\_cidrs) | List of private subnet CIDR blocks |
+| <a name="output_private_subnet_ids"></a> [private\_subnet\_ids](#output\_private\_subnet\_ids) | List of private subnet IDs (for EKS nodes) |
+| <a name="output_public_route_table_ids"></a> [public\_route\_table\_ids](#output\_public\_route\_table\_ids) | Public route table IDs |
+| <a name="output_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#output\_public\_subnet\_cidrs) | List of public subnet CIDR blocks |
+| <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | List of public subnet IDs (for load balancers) |
+| <a name="output_vpc_arn"></a> [vpc\_arn](#output\_vpc\_arn) | ARN of the VPC |
+| <a name="output_vpc_cidr"></a> [vpc\_cidr](#output\_vpc\_cidr) | VPC CIDR block |
+| <a name="output_vpc_default_security_group_id"></a> [vpc\_default\_security\_group\_id](#output\_vpc\_default\_security\_group\_id) | Default VPC security group ID |
+| <a name="output_vpc_endpoint_interface_dns_entries"></a> [vpc\_endpoint\_interface\_dns\_entries](#output\_vpc\_endpoint\_interface\_dns\_entries) | DNS entries for interface VPC endpoints |
+| <a name="output_vpc_endpoint_security_group_id"></a> [vpc\_endpoint\_security\_group\_id](#output\_vpc\_endpoint\_security\_group\_id) | Security group ID for VPC endpoints |
+| <a name="output_vpc_endpoints"></a> [vpc\_endpoints](#output\_vpc\_endpoints) | Map of VPC endpoint IDs |
+| <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | VPC ID for EKS module |
+| <a name="output_vpc_tags"></a> [vpc\_tags](#output\_vpc\_tags) | Tags applied to the VPC |
 <!-- END_TF_DOCS -->
