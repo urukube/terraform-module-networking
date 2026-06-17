@@ -7,10 +7,11 @@ module "vpc" {
   cidr = var.vpc_cidr
 
   azs             = local.azs
-  private_subnets = local.private_subnets
+  private_subnets = local.eks_node_subnets
+  intra_subnets   = local.resource_subnets
   public_subnets  = local.public_subnets
 
-  # NAT Gateway configuration
+  # NAT Gateway — only needed for EKS node subnet (private tier)
   enable_nat_gateway = var.enable_nat_gateway
   single_nat_gateway = var.single_nat_gateway
 
@@ -27,14 +28,14 @@ module "vpc" {
   create_flow_log_cloudwatch_log_group            = var.enable_flow_logs
   flow_log_cloudwatch_log_group_retention_in_days = var.flow_logs_retention_days
 
-  # Subnet tagging for EKS
-  public_subnet_tags  = local.public_subnet_tags
+  # Subnet tagging
   private_subnet_tags = local.private_subnet_tags
+  intra_subnet_tags   = local.intra_subnet_tags
+  public_subnet_tags  = local.public_subnet_tags
 
   # Common tags
   tags = local.common_tags
 
-  # VPC tags
   vpc_tags = merge(local.common_tags, {
     Name = "${var.friendly_name}-${var.bu_id}-${var.app_id}-vpc"
   })

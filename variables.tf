@@ -38,14 +38,20 @@ variable "azs" {
   default     = []
 }
 
-variable "private_subnets" {
-  description = "List of CIDR blocks for private subnets. If not provided, will auto-calculate based on VPC CIDR"
+variable "eks_node_subnets" {
+  description = "CIDR blocks for EKS node subnets (private, has NAT GW route). If not provided, auto-calculates from VPC CIDR"
+  type        = list(string)
+  default     = []
+}
+
+variable "resource_subnets" {
+  description = "CIDR blocks for AWS resource subnets (private, no NAT GW route). Hosts RDS, ElastiCache, and other managed services accessible by EKS nodes"
   type        = list(string)
   default     = []
 }
 
 variable "public_subnets" {
-  description = "List of CIDR blocks for public subnets. If not provided, will auto-calculate based on VPC CIDR"
+  description = "CIDR blocks for public subnets (for load balancers). If not provided, auto-calculates from VPC CIDR"
   type        = list(string)
   default     = []
 }

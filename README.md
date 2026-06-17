@@ -296,6 +296,7 @@ This module is part of OrbitCluster and follows the project's licensing terms.
 | [aws_lb_target_group.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_lb_target_group.network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_security_group.alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.aws_resources](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.eks_control_plane](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.eks_nodes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.istio](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
@@ -307,6 +308,7 @@ This module is part of OrbitCluster and follows the project's licensing terms.
 | [aws_vpc_security_group_egress_rule.control_plane_to_nodes_kubelet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [aws_vpc_security_group_egress_rule.eks_nodes_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [aws_vpc_security_group_egress_rule.istio_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_egress_rule.resources_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [aws_vpc_security_group_egress_rule.vpc_endpoints_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.alb_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.alb_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
@@ -316,6 +318,7 @@ This module is part of OrbitCluster and follows the project's licensing terms.
 | [aws_vpc_security_group_ingress_rule.istio_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.istio_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.istio_pilot](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.resources_from_eks_nodes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.vpc_endpoints_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -336,6 +339,7 @@ This module is part of OrbitCluster and follows the project's licensing terms.
 | <a name="input_app_id"></a> [app\_id](#input\_app\_id) | application Unit | `string` | `null` | no |
 | <a name="input_azs"></a> [azs](#input\_azs) | List of availability zones. If not provided, will auto-detect 2-3 AZs in the region | `list(string)` | `[]` | no |
 | <a name="input_bu_id"></a> [bu\_id](#input\_bu\_id) | Business Unit | `string` | `null` | no |
+| <a name="input_eks_node_subnets"></a> [eks\_node\_subnets](#input\_eks\_node\_subnets) | CIDR blocks for EKS node subnets (private, has NAT GW route). If not provided, auto-calculates from VPC CIDR | `list(string)` | `[]` | no |
 | <a name="input_enable_alb"></a> [enable\_alb](#input\_enable\_alb) | Create Application Load Balancer | `bool` | `false` | no |
 | <a name="input_enable_dns_hostnames"></a> [enable\_dns\_hostnames](#input\_enable\_dns\_hostnames) | Enable DNS hostnames in VPC | `bool` | `true` | no |
 | <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | Enable DNS support in VPC | `bool` | `true` | no |
@@ -352,8 +356,8 @@ This module is part of OrbitCluster and follows the project's licensing terms.
 | <a name="input_nlb_access_logs_prefix"></a> [nlb\_access\_logs\_prefix](#input\_nlb\_access\_logs\_prefix) | S3 prefix for NLB access logs | `string` | `null` | no |
 | <a name="input_nlb_deletion_protection"></a> [nlb\_deletion\_protection](#input\_nlb\_deletion\_protection) | Enable deletion protection for Network Load Balancer | `bool` | `true` | no |
 | <a name="input_nlb_subnet_ids"></a> [nlb\_subnet\_ids](#input\_nlb\_subnet\_ids) | Subnet IDs for NLB. If not specified, uses public subnets | `list(string)` | `[]` | no |
-| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | List of CIDR blocks for private subnets. If not provided, will auto-calculate based on VPC CIDR | `list(string)` | `[]` | no |
-| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | List of CIDR blocks for public subnets. If not provided, will auto-calculate based on VPC CIDR | `list(string)` | `[]` | no |
+| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | CIDR blocks for public subnets (for load balancers). If not provided, auto-calculates from VPC CIDR | `list(string)` | `[]` | no |
+| <a name="input_resource_subnets"></a> [resource\_subnets](#input\_resource\_subnets) | CIDR blocks for AWS resource subnets (private, no NAT GW route). Hosts RDS, ElastiCache, and other managed services accessible by EKS nodes | `list(string)` | `[]` | no |
 | <a name="input_single_nat_gateway"></a> [single\_nat\_gateway](#input\_single\_nat\_gateway) | Use single NAT Gateway to reduce costs (not recommended for production) | `bool` | `false` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags for all resources | `map(string)` | `{}` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for VPC | `string` | `"10.0.0.0/16"` | no |
@@ -367,9 +371,13 @@ This module is part of OrbitCluster and follows the project's licensing terms.
 | <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | Application Load Balancer DNS name (if created) |
 | <a name="output_alb_security_group_id"></a> [alb\_security\_group\_id](#output\_alb\_security\_group\_id) | Security group ID for ALB (if created) |
 | <a name="output_alb_zone_id"></a> [alb\_zone\_id](#output\_alb\_zone\_id) | Application Load Balancer hosted zone ID (if created) |
-| <a name="output_all_subnet_ids"></a> [all\_subnet\_ids](#output\_all\_subnet\_ids) | Combined list of all subnet IDs |
+| <a name="output_all_subnet_ids"></a> [all\_subnet\_ids](#output\_all\_subnet\_ids) | Combined list of all subnet IDs across all tiers |
+| <a name="output_aws_resources_security_group_id"></a> [aws\_resources\_security\_group\_id](#output\_aws\_resources\_security\_group\_id) | Security group ID for AWS managed resources (RDS, ElastiCache, etc.) — allows inbound from EKS nodes |
 | <a name="output_azs"></a> [azs](#output\_azs) | Availability zones used |
 | <a name="output_control_plane_security_group_id"></a> [control\_plane\_security\_group\_id](#output\_control\_plane\_security\_group\_id) | Security group ID for EKS control plane |
+| <a name="output_eks_node_route_table_ids"></a> [eks\_node\_route\_table\_ids](#output\_eks\_node\_route\_table\_ids) | Route table IDs for EKS node subnets (has NAT GW route) |
+| <a name="output_eks_node_subnet_cidrs"></a> [eks\_node\_subnet\_cidrs](#output\_eks\_node\_subnet\_cidrs) | CIDR blocks for EKS node subnets |
+| <a name="output_eks_node_subnet_ids"></a> [eks\_node\_subnet\_ids](#output\_eks\_node\_subnet\_ids) | Subnet IDs for EKS node placement (private, has NAT GW route) |
 | <a name="output_igw_id"></a> [igw\_id](#output\_igw\_id) | Internet Gateway ID |
 | <a name="output_istio_security_group_id"></a> [istio\_security\_group\_id](#output\_istio\_security\_group\_id) | Security group ID for Istio service mesh |
 | <a name="output_nat_gateway_ids"></a> [nat\_gateway\_ids](#output\_nat\_gateway\_ids) | NAT Gateway IDs |
@@ -379,12 +387,12 @@ This module is part of OrbitCluster and follows the project's licensing terms.
 | <a name="output_nlb_target_group_arn"></a> [nlb\_target\_group\_arn](#output\_nlb\_target\_group\_arn) | NLB target group ARN (if created) |
 | <a name="output_nlb_zone_id"></a> [nlb\_zone\_id](#output\_nlb\_zone\_id) | Network Load Balancer hosted zone ID (if created) |
 | <a name="output_node_security_group_id"></a> [node\_security\_group\_id](#output\_node\_security\_group\_id) | Security group ID for EKS nodes |
-| <a name="output_private_route_table_ids"></a> [private\_route\_table\_ids](#output\_private\_route\_table\_ids) | Private route table IDs |
-| <a name="output_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#output\_private\_subnet\_cidrs) | List of private subnet CIDR blocks |
-| <a name="output_private_subnet_ids"></a> [private\_subnet\_ids](#output\_private\_subnet\_ids) | List of private subnet IDs (for EKS nodes) |
 | <a name="output_public_route_table_ids"></a> [public\_route\_table\_ids](#output\_public\_route\_table\_ids) | Public route table IDs |
-| <a name="output_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#output\_public\_subnet\_cidrs) | List of public subnet CIDR blocks |
-| <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | List of public subnet IDs (for load balancers) |
+| <a name="output_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#output\_public\_subnet\_cidrs) | CIDR blocks for public subnets |
+| <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | Subnet IDs for load balancers (public) |
+| <a name="output_resource_route_table_ids"></a> [resource\_route\_table\_ids](#output\_resource\_route\_table\_ids) | Route table IDs for AWS resource subnets (VPC-local only) |
+| <a name="output_resource_subnet_cidrs"></a> [resource\_subnet\_cidrs](#output\_resource\_subnet\_cidrs) | CIDR blocks for AWS resource subnets |
+| <a name="output_resource_subnet_ids"></a> [resource\_subnet\_ids](#output\_resource\_subnet\_ids) | Subnet IDs for AWS managed resources — RDS, ElastiCache, etc. (private, VPC-local only) |
 | <a name="output_vpc_arn"></a> [vpc\_arn](#output\_vpc\_arn) | ARN of the VPC |
 | <a name="output_vpc_cidr"></a> [vpc\_cidr](#output\_vpc\_cidr) | VPC CIDR block |
 | <a name="output_vpc_default_security_group_id"></a> [vpc\_default\_security\_group\_id](#output\_vpc\_default\_security\_group\_id) | Default VPC security group ID |

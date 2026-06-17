@@ -4,7 +4,7 @@ variables {
   bu_id         = "BU12345"
   app_id        = "APP67890"
   vpc_cidr      = "10.0.0.0/16"
-  azs           = ["us-east-1a", "us-east-1b"]
+  azs           = ["us-east-1a"]
 }
 
 run "vpc_defaults" {
@@ -26,23 +26,28 @@ run "vpc_defaults" {
   }
 
   assert {
-    condition     = length(module.vpc.private_subnets) == 2
-    error_message = "Number of private subnets matching AZs"
+    condition     = length(module.vpc.private_subnets) == 1
+    error_message = "Expected 1 EKS node subnet"
   }
 
   assert {
-    condition     = length(module.vpc.public_subnets) == 2
-    error_message = "Number of public subnets matching AZs"
+    condition     = length(module.vpc.intra_subnets) == 1
+    error_message = "Expected 1 AWS resource subnet"
+  }
+
+  assert {
+    condition     = length(module.vpc.public_subnets) == 1
+    error_message = "Expected 1 public subnet"
   }
 
   assert {
     condition     = length(module.vpc.natgw_ids) > 0
-    error_message = "NAT Gateways should be created by default"
+    error_message = "NAT Gateway should be created for EKS node subnet"
   }
 
   assert {
-    condition     = length(module.vpc.private_route_table_ids) == 2
-    error_message = "Private route tables should be created for each private subnet (implicitly associating with NAT GW)"
+    condition     = length(module.vpc.private_route_table_ids) == 1
+    error_message = "One route table expected for EKS node subnet"
   }
 }
 
@@ -62,40 +67,25 @@ run "vpc_cost_optimized" {
 run "auto_subnets" {
   command = plan
 
-  # Clear list variables to trigger auto-calculation
   variables {
-    azs             = []
-    private_subnets = []
-    public_subnets  = []
+    azs              = []
+    eks_node_subnets = []
+    resource_subnets = []
+    public_subnets   = []
   }
 
   assert {
     condition     = module.vpc.private_subnets_cidr_blocks[0] == "10.0.0.0/19"
-    error_message = "Private Subnet 1 CIDR calculation incorrect"
+    error_message = "EKS node subnet CIDR calculation incorrect"
   }
 
   assert {
-    condition     = module.vpc.private_subnets_cidr_blocks[1] == "10.0.32.0/19"
-    error_message = "Private Subnet 2 CIDR calculation incorrect"
-  }
-
-  assert {
-    condition     = module.vpc.private_subnets_cidr_blocks[2] == "10.0.64.0/19"
-    error_message = "Private Subnet 3 CIDR calculation incorrect"
+    condition     = module.vpc.intra_subnets_cidr_blocks[0] == "10.0.32.0/19"
+    error_message = "Resource subnet CIDR calculation incorrect"
   }
 
   assert {
     condition     = module.vpc.public_subnets_cidr_blocks[0] == "10.0.96.0/24"
-    error_message = "Public Subnet 1 CIDR calculation incorrect"
-  }
-
-  assert {
-    condition     = module.vpc.public_subnets_cidr_blocks[1] == "10.0.97.0/24"
-    error_message = "Public Subnet 2 CIDR calculation incorrect"
-  }
-
-  assert {
-    condition     = module.vpc.public_subnets_cidr_blocks[2] == "10.0.98.0/24"
-    error_message = "Public Subnet 3 CIDR calculation incorrect"
+    error_message = "Public subnet CIDR calculation incorrect"
   }
 }

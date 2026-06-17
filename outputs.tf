@@ -21,28 +21,38 @@ output "vpc_tags" {
 }
 
 # Subnet outputs
-output "private_subnet_ids" {
-  description = "List of private subnet IDs (for EKS nodes)"
+output "eks_node_subnet_ids" {
+  description = "Subnet IDs for EKS node placement (private, has NAT GW route)"
   value       = module.vpc.private_subnets
 }
 
+output "resource_subnet_ids" {
+  description = "Subnet IDs for AWS managed resources — RDS, ElastiCache, etc. (private, VPC-local only)"
+  value       = module.vpc.intra_subnets
+}
+
 output "public_subnet_ids" {
-  description = "List of public subnet IDs (for load balancers)"
+  description = "Subnet IDs for load balancers (public)"
   value       = module.vpc.public_subnets
 }
 
 output "all_subnet_ids" {
-  description = "Combined list of all subnet IDs"
-  value       = concat(module.vpc.private_subnets, module.vpc.public_subnets)
+  description = "Combined list of all subnet IDs across all tiers"
+  value       = concat(module.vpc.private_subnets, module.vpc.intra_subnets, module.vpc.public_subnets)
 }
 
-output "private_subnet_cidrs" {
-  description = "List of private subnet CIDR blocks"
+output "eks_node_subnet_cidrs" {
+  description = "CIDR blocks for EKS node subnets"
   value       = module.vpc.private_subnets_cidr_blocks
 }
 
+output "resource_subnet_cidrs" {
+  description = "CIDR blocks for AWS resource subnets"
+  value       = module.vpc.intra_subnets_cidr_blocks
+}
+
 output "public_subnet_cidrs" {
-  description = "List of public subnet CIDR blocks"
+  description = "CIDR blocks for public subnets"
   value       = module.vpc.public_subnets_cidr_blocks
 }
 
@@ -82,6 +92,11 @@ output "vpc_endpoint_security_group_id" {
 output "istio_security_group_id" {
   description = "Security group ID for Istio service mesh"
   value       = var.enable_istio_support ? aws_security_group.istio[0].id : null
+}
+
+output "aws_resources_security_group_id" {
+  description = "Security group ID for AWS managed resources (RDS, ElastiCache, etc.) — allows inbound from EKS nodes"
+  value       = aws_security_group.aws_resources.id
 }
 
 output "vpc_default_security_group_id" {
@@ -127,9 +142,14 @@ output "nlb_target_group_arn" {
 }
 
 # Route table outputs
-output "private_route_table_ids" {
-  description = "Private route table IDs"
+output "eks_node_route_table_ids" {
+  description = "Route table IDs for EKS node subnets (has NAT GW route)"
   value       = module.vpc.private_route_table_ids
+}
+
+output "resource_route_table_ids" {
+  description = "Route table IDs for AWS resource subnets (VPC-local only)"
+  value       = module.vpc.intra_route_table_ids
 }
 
 output "public_route_table_ids" {

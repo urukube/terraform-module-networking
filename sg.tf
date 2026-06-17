@@ -288,6 +288,55 @@ resource "aws_vpc_security_group_egress_rule" "istio_egress" {
   )
 }
 
+# Security group for AWS resource subnet (RDS, ElastiCache, etc.)
+resource "aws_security_group" "aws_resources" {
+  # checkov:skip=CKV2_AWS_5:Security group attached in external module
+  name_prefix = "${var.friendly_name}-${var.bu_id}-${var.app_id}-resources-sg-"
+  description = "Security group for AWS managed resources (RDS, ElastiCache, etc.)"
+  vpc_id      = module.vpc.vpc_id
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.friendly_name}-${var.bu_id}-${var.app_id}-resources-sg"
+    }
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Allow all traffic from EKS nodes into the resource subnet
+resource "aws_vpc_security_group_ingress_rule" "resources_from_eks_nodes" {
+  security_group_id            = aws_security_group.aws_resources.id
+  description                  = "Allow all traffic from EKS nodes"
+  referenced_security_group_id = aws_security_group.eks_nodes.id
+  ip_protocol                  = "-1"
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.friendly_name}-${var.bu_id}-${var.app_id}-resources-from-eks-nodes-sg"
+    }
+  )
+}
+
+# Allow egress within VPC only (resource subnet has no NAT GW route)
+resource "aws_vpc_security_group_egress_rule" "resources_egress" {
+  security_group_id = aws_security_group.aws_resources.id
+  description       = "Allow all outbound traffic within VPC"
+  cidr_ipv4         = var.vpc_cidr
+  ip_protocol       = "-1"
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.friendly_name}-${var.bu_id}-${var.app_id}-resources-egress-sg"
+    }
+  )
+}
+
 # Security group for Application Load Balancer
 resource "aws_security_group" "alb" {
   # checkov:skip=CKV2_AWS_5:Security group attached in external module

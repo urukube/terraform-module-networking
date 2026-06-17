@@ -109,6 +109,7 @@ resource "aws_vpc_endpoint" "gateway" {
 
   route_table_ids = concat(
     module.vpc.private_route_table_ids,
+    module.vpc.intra_route_table_ids,
     module.vpc.public_route_table_ids
   )
 
