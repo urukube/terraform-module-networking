@@ -15,9 +15,10 @@ locals {
   ]
 
   # Public subnet — for load balancers only
-  # Default: 10.0.96.0/24 (256 IPs)
+  # Offset 192 avoids overlap with /19 private tiers (EKS: 0-2, resources: 3-5)
+  # which together cover 10.0.0.0-10.0.191.255. Default: 10.0.192.0/24 (256 IPs)
   public_subnets = length(var.public_subnets) > 0 ? var.public_subnets : [
-    for idx, az in local.azs : cidrsubnet(var.vpc_cidr, 8, 96 + idx)
+    for idx, az in local.azs : cidrsubnet(var.vpc_cidr, 8, 192 + idx)
   ]
 
   common_tags = merge(

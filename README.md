@@ -23,17 +23,94 @@ A comprehensive Terraform module for setting up AWS networking infrastructure re
 
 ## Architecture
 
-This module implements the following AWS networking architecture:
+### Network Layout
 
-- **VPC** with configurable CIDR (default: `10.0.0.0/16`)
-- **Public Subnets** across multiple AZs for NAT gateways and load balancers
-- **Private Subnets** across multiple AZs for EKS nodes and pods
-- **Internet Gateway** for public subnet internet access
-- **NAT Gateways** for private subnet outbound internet access
-- **VPC Endpoints** to reduce NAT costs and improve security
-- **Security Groups** for nodes, control plane, and VPC endpoints
-- **Optional Network Load Balancer** for TCP 443 traffic
-- **Optional Application Load Balancer** for HTTP/HTTPS traffic
+The VPC is divided into **three subnet tiers**, each replicated across up to 3 Availability Zones for high availability. The tiers are purpose-built — each one has a distinct routing policy and security group to enforce the principle of least privilege.
+
+```
+                              Internet
+                                 │
+                        Internet Gateway
+                                 │
+┌────────────────────────────────┼──────────────────────────────────────────────────┐
+│  AWS VPC  10.0.0.0/16          │                                                  │
+│                                │                                                  │
+│  ┌─────────────────────┐  ┌────┴────────────────┐  ┌─────────────────────┐       │
+│  │  Availability       │  │  Availability       │  │  Availability       │       │
+│  │  Zone A             │  │  Zone B             │  │  Zone C             │       │
+│  │                     │  │                     │  │                     │       │
+│  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │       │
+│  │ │  PUBLIC SUBNET  │ │  │ │  PUBLIC SUBNET  │ │  │ │  PUBLIC SUBNET  │ │       │
+│  │ │  10.0.192.0/24  │ │  │ │  10.0.193.0/24  │ │  │ │  10.0.194.0/24  │ │       │
+│  │ │                 │ │  │ │                 │ │  │ │                 │ │       │
+│  │ │  [NAT Gateway]  │ │  │ │  [NAT Gateway]  │ │  │ │  [NAT Gateway]  │ │       │
+│  │ │  [ALB / NLB]    │ │  │ │  [ALB / NLB]    │ │  │ │  [ALB / NLB]    │ │       │
+│  │ └────────┬────────┘ │  │ └────────┬────────┘ │  │ └────────┬────────┘ │       │
+│  │          │ (1)      │  │          │          │  │          │          │       │
+│  │    NAT outbound     │  │    NAT outbound     │  │    NAT outbound     │       │
+│  │          │          │  │          │          │  │          │          │       │
+│  │          ▼          │  │          ▼          │  │          ▼          │       │
+│  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │       │
+│  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │       │
+│  │ │  EKS Node Tier  │ │  │ │  EKS Node Tier  │ │  │ │  EKS Node Tier  │ │       │
+│  │ │  10.0.0.0/19    │ │  │ │  10.0.32.0/19   │ │  │ │  10.0.64.0/19   │ │       │
+│  │ │                 │ │  │ │                 │ │  │ │                 │ │       │
+│  │ │  [EKS Nodes]    │ │  │ │  [EKS Nodes]    │ │  │ │  [EKS Nodes]    │ │       │
+│  │ │  [K8s Pods]     │ │  │ │  [K8s Pods]     │ │  │ │  [K8s Pods]     │ │       │
+│  │ └────────┬────────┘ │  │ └────────┬────────┘ │  │ └────────┬────────┘ │       │
+│  │          │ (2)      │  │          │          │  │          │          │       │
+│  │   SG: all traffic   │  │   SG: all traffic   │  │   SG: all traffic   │       │
+│  │   from EKS nodes SG │  │   from EKS nodes SG │  │   from EKS nodes SG │       │
+│  │          │          │  │          │          │  │          │          │       │
+│  │          ▼          │  │          ▼          │  │          ▼          │       │
+│  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │       │
+│  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │       │
+│  │ │  Resource Tier  │ │  │ │  Resource Tier  │ │  │ │  Resource Tier  │ │       │
+│  │ │  10.0.96.0/19   │ │  │ │  10.0.128.0/19  │ │  │ │  10.0.160.0/19  │ │       │
+│  │ │                 │ │  │ │                 │ │  │ │                 │ │       │
+│  │ │  [RDS]          │ │  │ │  [RDS]          │ │  │ │  [RDS]          │ │       │
+│  │ │  [ElastiCache]  │ │  │ │  [ElastiCache]  │ │  │ │  [ElastiCache]  │ │       │
+│  │ │  [MSK / etc.]   │ │  │ │  [MSK / etc.]   │ │  │ │  [MSK / etc.]   │ │       │
+│  │ └─────────────────┘ │  │ └─────────────────┘ │  │ └─────────────────┘ │       │
+│  └─────────────────────┘  └─────────────────────┘  └─────────────────────┘       │
+│                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────┐   │
+│  │  VPC Endpoints                                                    (3)      │   │
+│  │  Interface : SSM · SSMMessages · EC2Messages · KMS · ECR API · ECR DKR   │   │
+│  │             EC2 · STS · EKS · CloudWatch Logs                             │   │
+│  │  Gateway   : S3 · DynamoDB  (routes added to all three subnet tiers)      │   │
+│  └────────────────────────────────────────────────────────────────────────────┘   │
+└───────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Communication Flows
+
+| # | Flow | Mechanism | Notes |
+|---|---|---|---|
+| **1** | **EKS Nodes → Internet** (outbound) | NAT Gateway in public subnet | Required to pull images from public registries or call external APIs |
+| **2** | **EKS Nodes → Resource Tier** | VPC local route + Security Group | `aws_resources` SG allows all inbound from `eks_nodes` SG. No NAT needed — same VPC |
+| **3** | **EKS Nodes → AWS Services** | VPC Interface Endpoints (private DNS) | SSM, KMS, ECR, STS, EC2, etc. Traffic never leaves AWS network |
+| | **EKS Nodes → S3 / DynamoDB** | VPC Gateway Endpoints | Routes injected into EKS node and resource tier route tables |
+| | **Internet → Load Balancer** | Internet Gateway → ALB / NLB in public subnet | External traffic enters only through LBs |
+| | **Load Balancer → EKS Nodes** | LB target group → EKS node SG (port 443 / NodePort) | EKS nodes SG allows HTTPS from anywhere when NLB is enabled |
+| | **EKS Control Plane ↔ Nodes** | Security Group rules (bidirectional) | HTTPS (443) both directions; kubelet (1025–65535) control plane → nodes |
+| | **Resource Tier → Internet** | **Not routed** | Resource subnets are `intra` (no NAT GW route). Managed services (RDS, ElastiCache) do not need outbound internet |
+
+---
+
+### Subnet CIDR Auto-Calculation
+
+With the default VPC CIDR `10.0.0.0/16` and 3 AZs:
+
+| Tier | AZ-A | AZ-B | AZ-C | Size | Route |
+|---|---|---|---|---|---|
+| **EKS Nodes** (private) | `10.0.0.0/19` | `10.0.32.0/19` | `10.0.64.0/19` | 8,192 IPs | → NAT GW |
+| **Resources** (private) | `10.0.96.0/19` | `10.0.128.0/19` | `10.0.160.0/19` | 8,192 IPs | VPC local only |
+| **Public** | `10.0.192.0/24` | `10.0.193.0/24` | `10.0.194.0/24` | 256 IPs | → IGW |
+
+The EKS node tier is sized `/19` (8,192 IPs) to accommodate large pod densities. The public tier is `/24` (256 IPs) since it hosts only NAT Gateways and load balancers.
 
 ## Inputs
 
@@ -135,13 +212,17 @@ module "networking" {
   # Availability zones (default: auto-detect 2-3 AZs in region)
   azs = ["us-east-1a", "us-east-1b", "us-east-1c"]
 
-  # Private subnet CIDRs (default: auto-calculated from vpc_cidr)
-  # These subnets will host EKS worker nodes and pods
-  private_subnets = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
+  # EKS node subnet CIDRs (default: auto-calculated from vpc_cidr)
+  # These subnets host EKS worker nodes and pods — one per AZ
+  eks_node_subnets = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
+
+  # Resource subnet CIDRs (default: auto-calculated from vpc_cidr)
+  # These subnets host RDS, ElastiCache, MSK, etc. — VPC-local only, no NAT
+  resource_subnets = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
 
   # Public subnet CIDRs (default: auto-calculated from vpc_cidr)
-  # These subnets will host NAT gateways and load balancers
-  public_subnets = ["10.0.96.0/24", "10.0.97.0/24", "10.0.98.0/24"]
+  # These subnets host NAT gateways and load balancers — one per AZ
+  public_subnets = ["10.0.192.0/24", "10.0.193.0/24", "10.0.194.0/24"]
 
   # Enable DNS hostnames in VPC (default: true)
   enable_dns_hostnames = true
@@ -236,21 +317,6 @@ module "networking" {
   flow_logs_retention_days = 30
 }
 ```
-
-## Subnet CIDR Calculation
-
-If you don't specify subnet CIDRs, they will be auto-calculated from the VPC CIDR:
-
-**For VPC CIDR `10.0.0.0/16`:**
-
-- Private Subnets (each /19, 8,192 IPs):
-  - AZ 1: `10.0.0.0/19`
-  - AZ 2: `10.0.32.0/19`
-  - AZ 3: `10.0.64.0/19`
-- Public Subnets (each /24, 256 IPs):
-  - AZ 1: `10.0.96.0/24`
-  - AZ 2: `10.0.97.0/24`
-  - AZ 3: `10.0.98.0/24`
 
 ## Security Best Practices
 
