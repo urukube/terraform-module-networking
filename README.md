@@ -27,60 +27,63 @@ A comprehensive Terraform module for setting up AWS networking infrastructure re
 
 The VPC is divided into **three subnet tiers**, each replicated across up to 3 Availability Zones for high availability. The tiers are purpose-built — each one has a distinct routing policy and security group to enforce the principle of least privilege.
 
-```
-                              Internet
-                                 │
-                        Internet Gateway
-                                 │
-┌────────────────────────────────┼──────────────────────────────────────────────────┐
-│  AWS VPC  10.0.0.0/16          │                                                  │
-│                                │                                                  │
-│  ┌─────────────────────┐  ┌────┴────────────────┐  ┌─────────────────────┐       │
-│  │  Availability       │  │  Availability       │  │  Availability       │       │
-│  │  Zone A             │  │  Zone B             │  │  Zone C             │       │
-│  │                     │  │                     │  │                     │       │
-│  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │       │
-│  │ │  PUBLIC SUBNET  │ │  │ │  PUBLIC SUBNET  │ │  │ │  PUBLIC SUBNET  │ │       │
-│  │ │  10.0.192.0/24  │ │  │ │  10.0.193.0/24  │ │  │ │  10.0.194.0/24  │ │       │
-│  │ │                 │ │  │ │                 │ │  │ │                 │ │       │
-│  │ │  [NAT Gateway]  │ │  │ │  [NAT Gateway]  │ │  │ │  [NAT Gateway]  │ │       │
-│  │ │  [ALB / NLB]    │ │  │ │  [ALB / NLB]    │ │  │ │  [ALB / NLB]    │ │       │
-│  │ └────────┬────────┘ │  │ └────────┬────────┘ │  │ └────────┬────────┘ │       │
-│  │          │ (1)      │  │          │          │  │          │          │       │
-│  │    NAT outbound     │  │    NAT outbound     │  │    NAT outbound     │       │
-│  │          │          │  │          │          │  │          │          │       │
-│  │          ▼          │  │          ▼          │  │          ▼          │       │
-│  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │       │
-│  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │       │
-│  │ │  EKS Node Tier  │ │  │ │  EKS Node Tier  │ │  │ │  EKS Node Tier  │ │       │
-│  │ │  10.0.0.0/19    │ │  │ │  10.0.32.0/19   │ │  │ │  10.0.64.0/19   │ │       │
-│  │ │                 │ │  │ │                 │ │  │ │                 │ │       │
-│  │ │  [EKS Nodes]    │ │  │ │  [EKS Nodes]    │ │  │ │  [EKS Nodes]    │ │       │
-│  │ │  [K8s Pods]     │ │  │ │  [K8s Pods]     │ │  │ │  [K8s Pods]     │ │       │
-│  │ └────────┬────────┘ │  │ └────────┬────────┘ │  │ └────────┬────────┘ │       │
-│  │          │ (2)      │  │          │          │  │          │          │       │
-│  │   SG: all traffic   │  │   SG: all traffic   │  │   SG: all traffic   │       │
-│  │   from EKS nodes SG │  │   from EKS nodes SG │  │   from EKS nodes SG │       │
-│  │          │          │  │          │          │  │          │          │       │
-│  │          ▼          │  │          ▼          │  │          ▼          │       │
-│  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │  │ ┌─────────────────┐ │       │
-│  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │  │ │ PRIVATE SUBNET  │ │       │
-│  │ │  Resource Tier  │ │  │ │  Resource Tier  │ │  │ │  Resource Tier  │ │       │
-│  │ │  10.0.96.0/19   │ │  │ │  10.0.128.0/19  │ │  │ │  10.0.160.0/19  │ │       │
-│  │ │                 │ │  │ │                 │ │  │ │                 │ │       │
-│  │ │  [RDS]          │ │  │ │  [RDS]          │ │  │ │  [RDS]          │ │       │
-│  │ │  [ElastiCache]  │ │  │ │  [ElastiCache]  │ │  │ │  [ElastiCache]  │ │       │
-│  │ │  [MSK / etc.]   │ │  │ │  [MSK / etc.]   │ │  │ │  [MSK / etc.]   │ │       │
-│  │ └─────────────────┘ │  │ └─────────────────┘ │  │ └─────────────────┘ │       │
-│  └─────────────────────┘  └─────────────────────┘  └─────────────────────┘       │
-│                                                                                   │
-│  ┌────────────────────────────────────────────────────────────────────────────┐   │
-│  │  VPC Endpoints                                                    (3)      │   │
-│  │  Interface : SSM · SSMMessages · EC2Messages · KMS · ECR API · ECR DKR   │   │
-│  │             EC2 · STS · EKS · CloudWatch Logs                             │   │
-│  │  Gateway   : S3 · DynamoDB  (routes added to all three subnet tiers)      │   │
-│  └────────────────────────────────────────────────────────────────────────────┘   │
-└───────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    Internet(["🌐 Internet"])
+    IGW["Internet Gateway"]
+
+    Internet -->|HTTPS / TCP| IGW
+
+    subgraph VPC["AWS VPC  ·  10.0.0.0/16"]
+
+        subgraph LBs["Load Balancers  —  one resource per type, ENI placed in each public subnet"]
+            ALB["ALB\nHTTP · HTTPS\n(optional)"]
+            NLB["NLB\nTCP 443\n(optional)"]
+        end
+
+        subgraph AZA["Availability Zone A"]
+            PubA["Public Subnet\n10.0.192.0/24\n─────────────\nNAT Gateway\nLB ENI"]
+            EksA["Private · EKS Nodes\n10.0.0.0/19\n─────────────\nEKS Worker Nodes\nKubernetes Pods"]
+            ResA["Private · Resources\n10.0.96.0/19\n─────────────\nRDS · ElastiCache\nMSK · etc."]
+        end
+
+        subgraph AZB["Availability Zone B"]
+            PubB["Public Subnet\n10.0.193.0/24\n─────────────\nNAT Gateway\nLB ENI"]
+            EksB["Private · EKS Nodes\n10.0.32.0/19\n─────────────\nEKS Worker Nodes\nKubernetes Pods"]
+            ResB["Private · Resources\n10.0.128.0/19\n─────────────\nRDS · ElastiCache\nMSK · etc."]
+        end
+
+        subgraph AZC["Availability Zone C"]
+            PubC["Public Subnet\n10.0.194.0/24\n─────────────\nNAT Gateway\nLB ENI"]
+            EksC["Private · EKS Nodes\n10.0.64.0/19\n─────────────\nEKS Worker Nodes\nKubernetes Pods"]
+            ResC["Private · Resources\n10.0.160.0/19\n─────────────\nRDS · ElastiCache\nMSK · etc."]
+        end
+
+        subgraph VPCE["VPC Endpoints"]
+            IntEP["Interface Endpoints\nSSM · KMS · ECR API/DKR · STS · EKS · CW Logs"]
+            GwEP["Gateway Endpoints\nS3 · DynamoDB"]
+        end
+
+    end
+
+    %% Inbound: Internet → IGW → LBs → public subnet ENIs → EKS nodes
+    IGW --> ALB & NLB
+    ALB & NLB -->|"ENI per AZ"| PubA & PubB & PubC
+    PubA -->|"LB → nodes"| EksA
+    PubB -->|"LB → nodes"| EksB
+    PubC -->|"LB → nodes"| EksC
+
+    %% Outbound: EKS nodes → NAT GW (in public subnet) → IGW → Internet
+    EksA & EksB & EksC -->|"outbound via NAT GW"| IGW
+
+    %% East-West: EKS nodes → resource tier (SG-controlled, VPC local)
+    EksA -->|"SG: all traffic allowed"| ResA
+    EksB -->|"SG: all traffic allowed"| ResB
+    EksC -->|"SG: all traffic allowed"| ResC
+
+    %% AWS services via VPC endpoints (no NAT required)
+    EksA & EksB & EksC -->|"private DNS"| IntEP
+    EksA & EksB & EksC & ResA & ResB & ResC -->|"route table"| GwEP
 ```
 
 ---
