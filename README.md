@@ -2,11 +2,6 @@
 
 A comprehensive Terraform module for setting up AWS networking infrastructure required for EKS clusters. This module provides a one-stop solution for VPC, subnets, NAT gateways, security groups, VPC endpoints, and optional Network/Application Load Balancer configuration.
 
-<p align="center">
-  <img src="images/oc-module-networking-diagram.png" alt="Module Architecture - Networking">
-  <h4 align="center">Module Architecture - Networking</h4>
-</p>
-
 ## Features
 
 - 🌐 **Complete VPC Setup** - VPC with configurable CIDR blocks and DNS settings
