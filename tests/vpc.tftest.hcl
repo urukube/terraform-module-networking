@@ -4,7 +4,7 @@ variables {
   bu_id         = "BU12345"
   app_id        = "APP67890"
   vpc_cidr      = "10.0.0.0/16"
-  azs           = ["us-east-1a"]
+  azs           = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
 run "vpc_defaults" {
@@ -26,28 +26,28 @@ run "vpc_defaults" {
   }
 
   assert {
-    condition     = length(module.vpc.private_subnets) == 1
-    error_message = "Expected 1 EKS node subnet"
+    condition     = length(module.vpc.private_subnets) == 3
+    error_message = "Expected 1 EKS node subnet per AZ (3 total)"
   }
 
   assert {
-    condition     = length(module.vpc.intra_subnets) == 1
-    error_message = "Expected 1 AWS resource subnet"
+    condition     = length(module.vpc.intra_subnets) == 3
+    error_message = "Expected 1 resource subnet per AZ (3 total)"
   }
 
   assert {
-    condition     = length(module.vpc.public_subnets) == 1
-    error_message = "Expected 1 public subnet"
+    condition     = length(module.vpc.public_subnets) == 3
+    error_message = "Expected 1 public subnet per AZ (3 total)"
   }
 
   assert {
     condition     = length(module.vpc.natgw_ids) > 0
-    error_message = "NAT Gateway should be created for EKS node subnet"
+    error_message = "NAT Gateway should be created for EKS node subnets"
   }
 
   assert {
-    condition     = length(module.vpc.private_route_table_ids) == 1
-    error_message = "One route table expected for EKS node subnet"
+    condition     = length(module.vpc.private_route_table_ids) == 3
+    error_message = "One route table per EKS node subnet (one per AZ)"
   }
 }
 

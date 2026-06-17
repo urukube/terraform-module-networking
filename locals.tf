@@ -1,6 +1,6 @@
 locals {
-  # Single AZ by default — one subnet per tier (EKS nodes, AWS resources, public)
-  azs = length(var.azs) > 0 ? var.azs : slice(data.aws_availability_zones.available.names, 0, 1)
+  # Auto-detect up to 3 AZs — one subnet per tier per AZ for HA
+  azs = length(var.azs) > 0 ? var.azs : slice(data.aws_availability_zones.available.names, 0, min(3, length(data.aws_availability_zones.available.names)))
 
   # Tier 1 private: EKS node subnet — has NAT GW route for image pulls
   # Default: 10.0.0.0/19 (8,192 IPs)
