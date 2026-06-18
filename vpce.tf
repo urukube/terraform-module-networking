@@ -84,7 +84,7 @@ resource "aws_vpc_endpoint" "interface" {
   for_each = var.enable_vpc_endpoints ? local.interface_endpoints : {}
 
   vpc_id              = module.vpc.vpc_id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.${each.value.service}"
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.${each.value.service}"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = each.value.private_dns_enabled
 
@@ -104,7 +104,7 @@ resource "aws_vpc_endpoint" "gateway" {
   for_each = var.enable_vpc_endpoints ? local.gateway_endpoints : {}
 
   vpc_id            = module.vpc.vpc_id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.${each.value.service}"
+  service_name      = "com.amazonaws.${data.aws_region.current.region}.${each.value.service}"
   vpc_endpoint_type = "Gateway"
 
   route_table_ids = concat(
