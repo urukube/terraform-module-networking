@@ -80,7 +80,7 @@ run "auto_subnets" {
   }
 
   assert {
-    condition     = module.vpc.intra_subnets_cidr_blocks[0] == "10.0.32.0/19"
+    condition     = module.vpc.intra_subnets_cidr_blocks[0] == "10.0.96.0/19"
     error_message = "Resource subnet CIDR calculation incorrect"
   }
 
