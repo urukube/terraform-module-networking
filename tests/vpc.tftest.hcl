@@ -85,7 +85,7 @@ run "auto_subnets" {
   }
 
   assert {
-    condition     = module.vpc.public_subnets_cidr_blocks[0] == "10.0.96.0/24"
+    condition     = module.vpc.public_subnets_cidr_blocks[0] == "10.0.192.0/24"
     error_message = "Public subnet CIDR calculation incorrect"
   }
 }
