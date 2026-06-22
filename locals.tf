@@ -32,8 +32,8 @@ locals {
 
   # EKS node subnet tags — enables AWS LB controller discovery for internal LBs
   private_subnet_tags = {
-    "kubernetes.io/role/internal-elb"                                          = "1"
-    "kubernetes.io/cluster/${var.friendly_name}-${var.bu_id}-${var.app_id}-eks" = "shared"
+    "kubernetes.io/role/internal-elb"                    = "1"
+    "kubernetes.io/cluster/${var.friendly_name}-eks" = "shared"
   }
 
   # Resource subnet tags — marks the tier, explicitly excludes EKS scheduling
@@ -43,7 +43,7 @@ locals {
 
   # Public subnet tags — enables AWS LB controller discovery for external LBs
   public_subnet_tags = {
-    "kubernetes.io/role/elb"                                                   = "1"
-    "kubernetes.io/cluster/${var.friendly_name}-${var.bu_id}-${var.app_id}-eks" = "shared"
+    "kubernetes.io/role/elb"                             = "1"
+    "kubernetes.io/cluster/${var.friendly_name}-eks" = "shared"
   }
 }
